@@ -9,14 +9,18 @@ import static org.apache.spark.sql.functions.*;
 
 public class CrossingCounter {
 
-    public static long countAll(Dataset<Row> nodeDs) {
+    public CrossingCounter(SparkSession sparkSession) {
+        sparkSession.udf().register("isOnHighway", new IsCrossingUDF(), DataTypes.BooleanType);
+    }
+
+    public long countAll(Dataset<Row> nodeDs) {
         final Dataset<Row> crossings = nodeDs.filter(array_contains(col("tags_node.value"), "crossing"));
         return crossings.count();
 
     }
 
-    public static long countCrossings(SparkSession sparkSession, Dataset<Row> completeDs, String valueType) {
-        sparkSession.udf().register("isOnHighway", new IsCrossingUDF(), DataTypes.BooleanType);
+
+    public long countCrossings(Dataset<Row> completeDs, String valueType) {
         return completeDs.filter(array_contains(col("tags_node.value"), "crossing"))
                 .filter(callUDF("isOnHighway", col("tags"), lit(valueType))).count();
     }

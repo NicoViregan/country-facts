@@ -28,13 +28,15 @@ public class AppStarter {
 
         Dataset<Row> joinResult = NodeWayMerger.createJoinedDs(nodeDs, wayDs);
 
-        System.out.println("Crossing nodes: " + CrossingCounter.countAll(joinResult));
+        CrossingCounter counter = new CrossingCounter(sparkSession);
+
+        System.out.println("Crossing nodes: " + counter.countAll(joinResult));
         System.out.println(
-                "Residential crossings: " + CrossingCounter.countCrossings(sparkSession, joinResult, "residential"));
+                "Residential crossings: " + counter.countCrossings(joinResult, "residential"));
         System.out.println(
-                "Crossing primary road: " + CrossingCounter.countCrossings(sparkSession, joinResult, "primary"));
+                "Crossing primary road: " + counter.countCrossings( joinResult, "primary"));
         System.out.println(
-                "Crossing secondary road: " + CrossingCounter.countCrossings(sparkSession, joinResult, "secondary"));
+                "Crossing secondary road: " + counter.countCrossings( joinResult, "secondary"));
     }
 }
 
