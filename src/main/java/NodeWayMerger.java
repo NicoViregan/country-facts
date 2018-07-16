@@ -4,7 +4,7 @@ import org.apache.spark.sql.Row;
 import static org.apache.spark.sql.functions.col;
 
 
-public class DatasetCreator {
+public class NodeWayMerger {
 
 
     public static Dataset<Row> explodeNodes(Dataset<Row> wayDs) {
@@ -24,9 +24,9 @@ public class DatasetCreator {
     }
 
     public static Dataset<Row> createJoinedDs(Dataset<Row> nodeDs, Dataset<Row> wayDs) {
-        Dataset<Row> explodedWay = DatasetCreator.explodeNodes(wayDs);
-        Dataset<Row> explodedWayWithIdAndIndexColumns = DatasetCreator.addIndexAndIdColumns(explodedWay);
+        Dataset<Row> explodedWay = NodeWayMerger.explodeNodes(wayDs);
+        Dataset<Row> explodedWayWithIdAndIndexColumns = NodeWayMerger.addIndexAndIdColumns(explodedWay);
         Dataset<Row> renameNodeDs = RenameDatasets.renameNodeDs(nodeDs);
-        return DatasetCreator.join(explodedWayWithIdAndIndexColumns, renameNodeDs);
+        return NodeWayMerger.join(explodedWayWithIdAndIndexColumns, renameNodeDs);
     }
 }

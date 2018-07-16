@@ -1,11 +1,6 @@
 import org.apache.spark.sql.Dataset;
 import org.apache.spark.sql.Row;
 import org.apache.spark.sql.SparkSession;
-import org.apache.spark.sql.catalyst.plans.Cross;
-import org.apache.spark.sql.functions;
-
-import static org.apache.spark.sql.functions.col;
-import static org.apache.spark.sql.functions.lit;
 
 
 public class AppStarter {
@@ -31,12 +26,15 @@ public class AppStarter {
         System.out.println("Buses with wheelchair: " + BusCounter.countBusesWithWheelChair(sparkSession, relationDs));
 
 
-        Dataset<Row> joinResult = DatasetCreator.createJoinedDs(nodeDs, wayDs);
+        Dataset<Row> joinResult = NodeWayMerger.createJoinedDs(nodeDs, wayDs);
 
         System.out.println("Crossing nodes: " + CrossingCounter.countAll(joinResult));
-        System.out.println("Residential crossings: " + CrossingCounter.countCrossings(sparkSession, joinResult, "residential"));
-        System.out.println("Crossing primary road: " + CrossingCounter.countCrossings(sparkSession, joinResult, "primary"));
-        System.out.println("Crossing secondary road: " + CrossingCounter.countCrossings(sparkSession, joinResult, "secondary"));
-}
+        System.out.println(
+                "Residential crossings: " + CrossingCounter.countCrossings(sparkSession, joinResult, "residential"));
+        System.out.println(
+                "Crossing primary road: " + CrossingCounter.countCrossings(sparkSession, joinResult, "primary"));
+        System.out.println(
+                "Crossing secondary road: " + CrossingCounter.countCrossings(sparkSession, joinResult, "secondary"));
+    }
 }
 

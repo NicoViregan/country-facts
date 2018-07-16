@@ -16,9 +16,9 @@ public class CrossingCounter {
     }
 
     public static long countCrossings(SparkSession sparkSession, Dataset<Row> completeDs, String valueType) {
-        sparkSession.udf().register("isOnResidential", new IsCrossingUDF(), DataTypes.BooleanType);
+        sparkSession.udf().register("isOnHighway", new IsCrossingUDF(), DataTypes.BooleanType);
         return completeDs.filter(array_contains(col("tags_node.value"), "crossing"))
-                .filter(callUDF("isOnResidential", col("tags"), lit(valueType))).count();
+                .filter(callUDF("isOnHighway", col("tags"), lit(valueType))).count();
     }
 
 
