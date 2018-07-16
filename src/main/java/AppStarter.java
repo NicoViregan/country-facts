@@ -1,6 +1,7 @@
 import org.apache.spark.sql.Dataset;
 import org.apache.spark.sql.Row;
 import org.apache.spark.sql.SparkSession;
+import org.apache.spark.sql.catalyst.plans.Cross;
 import org.apache.spark.sql.functions;
 
 import static org.apache.spark.sql.functions.col;
@@ -22,18 +23,23 @@ public class AppStarter {
         final Dataset<Row> relationDs = ParquetReader.read(relationPath, sparkSession);
         final Dataset<Row> wayDs = ParquetReader.read(wayPath, sparkSession);
 
-//        nodeDs.show(5, false);
-//        relationDs.show(5, false);
-//        wayDs.show(5, false);
+        //        nodeDs.show(2, false);
+        //        relationDs.show(2, false);
+        //        wayDs.show(2, false);
 
-        System.out.println("All buses: " + BusCounter.countBuses(relationDs));
-        System.out.println("Buses with wheelchair: " + BusCounter.countBusesWithWheelChair(sparkSession, relationDs));
-
+        //        System.out.println("All buses: " + BusCounter.countBuses(relationDs));
+        //        System.out.println("Buses with wheelchair: " + BusCounter.countBusesWithWheelChair(sparkSession,
+        // relationDs));
+        //
         Dataset<Row> explodedWay = DatasetCreator.explodeNodes(wayDs);
         Dataset<Row> explodedWayWithIdAndIndexColumns = DatasetCreator.addIndexAndIdColumns(explodedWay);
-        Dataset<Row> joinResult = DatasetCreator.join(explodedWayWithIdAndIndexColumns , nodeDs);
-        joinResult.show(10, false);
+        Dataset<Row> renameNodeDs = RenameDatasets.renameNodeDs(nodeDs);
+        Dataset<Row> joinResult = DatasetCreator.join(explodedWayWithIdAndIndexColumns, renameNodeDs);
 
+        System.out.println("Crossing nodes: " + CrossingCounter.countAll(joinResult));
+        System.out.println("Residential crossings: " + CrossingCounter.countResidential(sparkSession, joinResult));
+        System.out.println("Crossing primary road: " + CrossingCounter.countPrimary(sparkSession, joinResult));
+        System.out.println("Crossing secondary road: " + CrossingCounter.countSecondary(sparkSession, joinResult));
     }
 }
 
