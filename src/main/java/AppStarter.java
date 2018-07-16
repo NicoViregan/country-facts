@@ -3,12 +3,18 @@ import org.apache.spark.sql.Row;
 import org.apache.spark.sql.SparkSession;
 
 
+enum RoadTypes {
+    RESIDENTIAL, PRIMARY, SECONDARY;
+}
+
+
 public class AppStarter {
 
     public static void main(String[] args) {
         SparkSession sparkSession = SparkSession.builder().master("local[*]").appName("CountryFacts")
                 .config("spark.sql.parquet.binaryAsString", "true").getOrCreate();
         sparkSession.sparkContext().setLogLevel("ERROR");
+
 
         final String nodePath = args[0];
         final String relationPath = args[1];
@@ -29,14 +35,11 @@ public class AppStarter {
         Dataset<Row> joinResult = NodeWayMerger.createJoinedDs(nodeDs, wayDs);
 
         CrossingCounter counter = new CrossingCounter(sparkSession);
-
         System.out.println("Crossing nodes: " + counter.countAll(joinResult));
-        System.out.println(
-                "Residential crossings: " + counter.countCrossings(joinResult, "residential"));
-        System.out.println(
-                "Crossing primary road: " + counter.countCrossings( joinResult, "primary"));
-        System.out.println(
-                "Crossing secondary road: " + counter.countCrossings( joinResult, "secondary"));
+        System.out.println("Residential crossings: " + counter
+                .countCrossings(joinResult, RoadTypes.RESIDENTIAL.toString().toLowerCase()));
+        System.out.println("Crossing primary road: " + counter.countCrossings(joinResult, RoadTypes.PRIMARY.toString().toLowerCase()));
+        System.out.println("Crossing secondary road: " + counter.countCrossings(joinResult, RoadTypes.SECONDARY.toString().toLowerCase()));
     }
 }
 

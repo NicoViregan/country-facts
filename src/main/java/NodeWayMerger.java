@@ -26,7 +26,7 @@ public class NodeWayMerger {
     public static Dataset<Row> createJoinedDs(Dataset<Row> nodeDs, Dataset<Row> wayDs) {
         Dataset<Row> explodedWay = NodeWayMerger.explodeNodes(wayDs);
         Dataset<Row> explodedWayWithIdAndIndexColumns = NodeWayMerger.addIndexAndIdColumns(explodedWay);
-        Dataset<Row> renameNodeDs = RenameDatasets.renameNodeDs(nodeDs);
+        Dataset<Row> renameNodeDs = ColumnsRenamer.rename(nodeDs);
         return NodeWayMerger.join(explodedWayWithIdAndIndexColumns, renameNodeDs);
     }
 }
