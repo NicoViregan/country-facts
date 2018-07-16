@@ -23,23 +23,20 @@ public class AppStarter {
         final Dataset<Row> relationDs = ParquetReader.read(relationPath, sparkSession);
         final Dataset<Row> wayDs = ParquetReader.read(wayPath, sparkSession);
 
-        //        nodeDs.show(2, false);
-        //        relationDs.show(2, false);
-        //        wayDs.show(2, false);
+        nodeDs.show(2, false);
+        relationDs.show(2, false);
+        wayDs.show(2, false);
 
-        //        System.out.println("All buses: " + BusCounter.countBuses(relationDs));
-        //        System.out.println("Buses with wheelchair: " + BusCounter.countBusesWithWheelChair(sparkSession,
-        // relationDs));
-        //
-        Dataset<Row> explodedWay = DatasetCreator.explodeNodes(wayDs);
-        Dataset<Row> explodedWayWithIdAndIndexColumns = DatasetCreator.addIndexAndIdColumns(explodedWay);
-        Dataset<Row> renameNodeDs = RenameDatasets.renameNodeDs(nodeDs);
-        Dataset<Row> joinResult = DatasetCreator.join(explodedWayWithIdAndIndexColumns, renameNodeDs);
+        System.out.println("All buses: " + BusCounter.countBuses(relationDs));
+        System.out.println("Buses with wheelchair: " + BusCounter.countBusesWithWheelChair(sparkSession, relationDs));
+
+
+        Dataset<Row> joinResult = DatasetCreator.createJoinedDs(nodeDs, wayDs);
 
         System.out.println("Crossing nodes: " + CrossingCounter.countAll(joinResult));
-        System.out.println("Residential crossings: " + CrossingCounter.countResidential(sparkSession, joinResult));
-        System.out.println("Crossing primary road: " + CrossingCounter.countPrimary(sparkSession, joinResult));
-        System.out.println("Crossing secondary road: " + CrossingCounter.countSecondary(sparkSession, joinResult));
-    }
+        System.out.println("Residential crossings: " + CrossingCounter.countCrossings(sparkSession, joinResult, "residential"));
+        System.out.println("Crossing primary road: " + CrossingCounter.countCrossings(sparkSession, joinResult, "primary"));
+        System.out.println("Crossing secondary road: " + CrossingCounter.countCrossings(sparkSession, joinResult, "secondary"));
+}
 }
 
