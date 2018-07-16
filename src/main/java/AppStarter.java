@@ -22,9 +22,9 @@ public class AppStarter {
         final Dataset<Row> relationDs = ParquetReader.read(relationPath, sparkSession);
         final Dataset<Row> wayDs = ParquetReader.read(wayPath, sparkSession);
 
-//        nodeDs.show(5, false);
-//        relationDs.show(5, false);
-//        wayDs.show(5, false);
+        nodeDs.show(5, false);
+        relationDs.show(5, false);
+        wayDs.show(5, false);
 
         System.out.println("All buses: " + BusCounter.countBuses(relationDs));
         System.out.println("Buses with wheelchair: " + BusCounter.countBusesWithWheelChair(sparkSession, relationDs));
