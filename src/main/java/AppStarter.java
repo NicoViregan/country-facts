@@ -1,16 +1,12 @@
 import org.apache.spark.sql.Dataset;
 import org.apache.spark.sql.Row;
 import org.apache.spark.sql.SparkSession;
-
-
-enum RoadTypes {
-    RESIDENTIAL, PRIMARY, SECONDARY;
-}
+import utilities.RoadTypes;
 
 
 public class AppStarter {
 
-    public static void main(String[] args) {
+    public static void main(final String[] args) {
         SparkSession sparkSession = SparkSession.builder().master("local[*]").appName("CountryFacts")
                 .config("spark.sql.parquet.binaryAsString", "true").getOrCreate();
         sparkSession.sparkContext().setLogLevel("ERROR");
@@ -24,22 +20,18 @@ public class AppStarter {
         final Dataset<Row> relationDs = ParquetReader.read(relationPath, sparkSession);
         final Dataset<Row> wayDs = ParquetReader.read(wayPath, sparkSession);
 
-        nodeDs.show(2, false);
-        relationDs.show(2, false);
-        wayDs.show(2, false);
-
-        System.out.println("All buses: " + BusCounter.countBuses(relationDs));
-        System.out.println("Buses with wheelchair: " + BusCounter.countBusesWithWheelChair(sparkSession, relationDs));
-
+        System.out.println("All buses: " + BusCounter.countAll(relationDs));
+        System.out.println("Buses with wheelchair: " + BusCounter.countWithWheelchair(sparkSession, relationDs));
+        System.out.println();
 
         Dataset<Row> joinResult = NodeWayMerger.createJoinedDs(nodeDs, wayDs);
 
         CrossingCounter counter = new CrossingCounter(sparkSession);
         System.out.println("Crossing nodes: " + counter.countAll(joinResult));
         System.out.println("Residential crossings: " + counter
-                .countCrossings(joinResult, RoadTypes.RESIDENTIAL.toString().toLowerCase()));
-        System.out.println("Crossing primary road: " + counter.countCrossings(joinResult, RoadTypes.PRIMARY.toString().toLowerCase()));
-        System.out.println("Crossing secondary road: " + counter.countCrossings(joinResult, RoadTypes.SECONDARY.toString().toLowerCase()));
+                .countByHighwayType(joinResult, RoadTypes.RESIDENTIAL.toString().toLowerCase()));
+        System.out.println("Crossing primary road: " + counter.countByHighwayType(joinResult, RoadTypes.PRIMARY.toString().toLowerCase()));
+        System.out.println("Crossing secondary road: " + counter.countByHighwayType(joinResult, RoadTypes.SECONDARY.toString().toLowerCase()));
     }
 }
 

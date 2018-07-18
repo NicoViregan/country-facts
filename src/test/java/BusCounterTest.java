@@ -1,12 +1,12 @@
-import UDF.IsWheelchairAccessBusUDF;
 import org.apache.spark.sql.Dataset;
 import org.apache.spark.sql.Row;
 import org.apache.spark.sql.SparkSession;
-import org.apache.spark.sql.types.DataTypes;
 import org.junit.After;
-import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+
 
 public class BusCounterTest {
 
@@ -19,7 +19,9 @@ public class BusCounterTest {
 
     @Test public void allCountedBuses() {
         Dataset<Row> testDs = ParquetReader.read("/Users/nicoletav/relationDsTest.parquet", sparkSession);
-        Assert.assertEquals((int) BusCounter.countBuses(testDs), 56);
+        final int expected = (int) BusCounter.countAll(testDs);
+        final int actual = 56;
+        assertEquals(expected, actual);
     }
 
     @After public void tearDown() {

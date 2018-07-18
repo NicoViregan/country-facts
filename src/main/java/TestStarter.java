@@ -19,6 +19,6 @@ public class TestStarter {
         final Dataset<Row> wayDs = ParquetReader.read(wayPath, sparkSession);
 
         TestDatasetCreator creator = new TestDatasetCreator();
-        creator.create(sparkSession, relationDs, "relation");
+        creator.create(sparkSession, relationDs);
     }
 }

@@ -11,15 +11,13 @@ import static org.apache.spark.sql.functions.col;
 
 public class BusCounter {
 
-    public static long countBuses(Dataset<Row> relationDs) {
-
+    public static long countAll(final Dataset<Row> relationDs) {
         final Dataset<Row> busRoutes = relationDs.filter(array_contains(col("tags.key"), "route"))
                 .filter(array_contains(col("tags.value"), "bus"));
         return busRoutes.count();
     }
 
-    public static long countBusesWithWheelChair(SparkSession sparkSession, Dataset<Row> relationDs) {
-
+    public static long countWithWheelchair(final SparkSession sparkSession, final Dataset<Row> relationDs) {
         sparkSession.udf().register("hasBusWheelchair", new IsWheelchairAccessBusUDF(), DataTypes.BooleanType);
         final Dataset<Row> busRelations = relationDs.filter(callUDF("hasBusWheelchair", col("tags")));
 
