@@ -2,6 +2,7 @@ import org.apache.spark.sql.Dataset;
 import org.apache.spark.sql.Row;
 import org.apache.spark.sql.SparkSession;
 
+
 public class TestStarter {
 
     public static void main(String[] args) {
@@ -18,7 +19,10 @@ public class TestStarter {
         final Dataset<Row> relationDs = ParquetReader.read(relationPath, sparkSession);
         final Dataset<Row> wayDs = ParquetReader.read(wayPath, sparkSession);
 
-        TestDatasetCreator creator = new TestDatasetCreator();
-        creator.create(sparkSession, relationDs);
+        TestDataSetCreator creator = new TestDataSetCreator();
+        creator.createRelationParquet(sparkSession, relationDs);
+        creator.createNodeWayParquet(nodeDs, wayDs);
+        creator.createNodeParquet(nodeDs);
+
     }
 }

@@ -24,14 +24,18 @@ public class AppStarter {
         System.out.println("Buses with wheelchair: " + BusCounter.countWithWheelchair(sparkSession, relationDs));
         System.out.println();
 
-        Dataset<Row> joinResult = NodeWayMerger.createJoinedDs(nodeDs, wayDs);
 
+        Dataset<Row> joinResult = NodeWayMerger.createJoinedDs(nodeDs, wayDs);
         CrossingCounter counter = new CrossingCounter(sparkSession);
         System.out.println("Crossing nodes: " + counter.countAll(joinResult));
         System.out.println("Residential crossings: " + counter
                 .countByHighwayType(joinResult, RoadTypes.RESIDENTIAL.toString().toLowerCase()));
-        System.out.println("Crossing primary road: " + counter.countByHighwayType(joinResult, RoadTypes.PRIMARY.toString().toLowerCase()));
-        System.out.println("Crossing secondary road: " + counter.countByHighwayType(joinResult, RoadTypes.SECONDARY.toString().toLowerCase()));
+        System.out.println("Crossing on primary road: " + counter
+                .countByHighwayType(joinResult, RoadTypes.PRIMARY.toString().toLowerCase()));
+        System.out.println("Crossing on secondary road: " + counter
+                .countByHighwayType(joinResult, RoadTypes.SECONDARY.toString().toLowerCase()));
+        System.out.println("Crossing on trunk road: " + counter.countByHighwayType(joinResult, RoadTypes.TRUNK.toString().toLowerCase()));
+        System.out.println("Crossing on motorway road: " + counter.countByHighwayType(joinResult, RoadTypes.MOTORWAY.toString().toLowerCase()));
     }
 }
 

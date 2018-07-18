@@ -1,4 +1,4 @@
-import UDF.IsCrossingUDF;
+import udf.IsCrossingUDF;
 import org.apache.spark.sql.Dataset;
 import org.apache.spark.sql.Row;
 import org.apache.spark.sql.SparkSession;
@@ -12,8 +12,8 @@ public class CrossingCounter {
         sparkSession.udf().register("isOnHighway", new IsCrossingUDF(), DataTypes.BooleanType);
     }
 
-    public long countAll(Dataset<Row> nodeDs) {
-        final Dataset<Row> crossings = nodeDs.filter(array_contains(col("node_tags.value"), "crossing"));
+    public long countAll(final Dataset<Row> completeDs) {
+        final Dataset<Row> crossings = completeDs.filter(array_contains(col("node_tags.value"), "crossing"));
         return crossings.count();
     }
 

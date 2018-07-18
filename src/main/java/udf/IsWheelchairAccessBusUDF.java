@@ -1,4 +1,4 @@
-package UDF;
+package udf;
 
 import org.apache.spark.sql.Row;
 
