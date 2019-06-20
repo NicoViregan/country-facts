@@ -8,8 +8,7 @@ import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-
-public class IsWheelchairAccessBusUDFTest {
+public class BusCounterTest {
 
     private static SparkSession sparkSession;
 
@@ -18,10 +17,9 @@ public class IsWheelchairAccessBusUDFTest {
                 .config("spark.sql.parquet.binaryAsString", "true").getOrCreate();
     }
 
-    @Test public void isWheelchairWhenTagYes() {
-        sparkSession.udf().register("hasWheelchair", new IsWheelchairAccessBusUDF(), DataTypes.BooleanType);
+    @Test public void allCountedBuses() {
         Dataset<Row> testDs = ParquetReader.read("/Users/nicoletav/relationDsTest.parquet", sparkSession);
-        Assert.assertEquals((int) BusCounter.countBusesWithWheelChair(sparkSession, testDs), 1);
+        Assert.assertEquals((int) BusCounter.countBuses(testDs), 56);
     }
 
     @After public void tearDown() {
