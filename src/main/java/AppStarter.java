@@ -1,19 +1,16 @@
 import org.apache.spark.sql.Dataset;
 import org.apache.spark.sql.Row;
 import org.apache.spark.sql.SparkSession;
-import org.apache.spark.sql.catalyst.plans.Cross;
-import org.apache.spark.sql.functions;
-
-import static org.apache.spark.sql.functions.col;
-import static org.apache.spark.sql.functions.lit;
+import utilities.RoadTypes;
 
 
 public class AppStarter {
 
-    public static void main(String[] args) {
+    public static void main(final String[] args) {
         SparkSession sparkSession = SparkSession.builder().master("local[*]").appName("CountryFacts")
                 .config("spark.sql.parquet.binaryAsString", "true").getOrCreate();
         sparkSession.sparkContext().setLogLevel("ERROR");
+
 
         final String nodePath = args[0];
         final String relationPath = args[1];
@@ -23,23 +20,22 @@ public class AppStarter {
         final Dataset<Row> relationDs = ParquetReader.read(relationPath, sparkSession);
         final Dataset<Row> wayDs = ParquetReader.read(wayPath, sparkSession);
 
-        //        nodeDs.show(2, false);
-        //        relationDs.show(2, false);
-        //        wayDs.show(2, false);
+        System.out.println("All buses: " + BusCounter.countAll(relationDs));
+        System.out.println("Buses with wheelchair: " + BusCounter.countWithWheelchair(sparkSession, relationDs));
+        System.out.println();
 
-        //        System.out.println("All buses: " + BusCounter.countBuses(relationDs));
-        //        System.out.println("Buses with wheelchair: " + BusCounter.countBusesWithWheelChair(sparkSession,
-        // relationDs));
-        //
-        Dataset<Row> explodedWay = DatasetCreator.explodeNodes(wayDs);
-        Dataset<Row> explodedWayWithIdAndIndexColumns = DatasetCreator.addIndexAndIdColumns(explodedWay);
-        Dataset<Row> renameNodeDs = RenameDatasets.renameNodeDs(nodeDs);
-        Dataset<Row> joinResult = DatasetCreator.join(explodedWayWithIdAndIndexColumns, renameNodeDs);
 
-        System.out.println("Crossing nodes: " + CrossingCounter.countAll(joinResult));
-        System.out.println("Residential crossings: " + CrossingCounter.countResidential(sparkSession, joinResult));
-        System.out.println("Crossing primary road: " + CrossingCounter.countPrimary(sparkSession, joinResult));
-        System.out.println("Crossing secondary road: " + CrossingCounter.countSecondary(sparkSession, joinResult));
+        Dataset<Row> joinResult = NodeWayMerger.createJoinedDs(nodeDs, wayDs);
+        CrossingCounter counter = new CrossingCounter(sparkSession);
+        System.out.println("Crossing nodes: " + counter.countAll(joinResult));
+        System.out.println("Residential crossings: " + counter
+                .countByHighwayType(joinResult, RoadTypes.RESIDENTIAL.toString().toLowerCase()));
+        System.out.println("Crossing on primary road: " + counter
+                .countByHighwayType(joinResult, RoadTypes.PRIMARY.toString().toLowerCase()));
+        System.out.println("Crossing on secondary road: " + counter
+                .countByHighwayType(joinResult, RoadTypes.SECONDARY.toString().toLowerCase()));
+        System.out.println("Crossing on trunk road: " + counter.countByHighwayType(joinResult, RoadTypes.TRUNK.toString().toLowerCase()));
+        System.out.println("Crossing on motorway road: " + counter.countByHighwayType(joinResult, RoadTypes.MOTORWAY.toString().toLowerCase()));
     }
 }
 
